@@ -56,6 +56,39 @@ function Particles(){
   </div>);
 }
 
+/* ─── Flowing Background — continuous gradient mesh across all sections ─── */
+function FlowingBG(){
+  const[scrollY,setScrollY]=useState(0);
+  useEffect(()=>{
+    const h=()=>setScrollY(window.scrollY);
+    window.addEventListener("scroll",h,{passive:true});
+    return()=>window.removeEventListener("scroll",h);
+  },[]);
+  const pageH = typeof document!=="undefined" ? document.documentElement.scrollHeight : 6000;
+  const pct = Math.min(scrollY / (pageH - window.innerHeight), 1);
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:0,pointerEvents:"none"}}>
+      {/* Primary flowing gradient — shifts with scroll */}
+      <div style={{
+        position:"absolute",inset:0,
+        background:`
+          radial-gradient(ellipse 80% 50% at ${20+pct*30}% ${30+pct*40}%, ${C.teal}16 0%, transparent 70%),
+          radial-gradient(ellipse 60% 70% at ${70-pct*20}% ${20+pct*50}%, ${C.blue}14 0%, transparent 60%),
+          radial-gradient(ellipse 50% 40% at ${50+pct*15}% ${60-pct*20}%, ${C.purple}0A 0%, transparent 50%),
+          radial-gradient(ellipse 40% 30% at ${30-pct*10}% ${80-pct*30}%, ${C.teal}0C 0%, transparent 40%)
+        `,
+        transition:"background .3s ease-out",
+      }}/>
+      {/* Subtle noise/grain texture */}
+      <div style={{
+        position:"absolute",inset:0,opacity:.015,
+        backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        backgroundSize:"128px 128px",
+      }}/>
+    </div>
+  );
+}
+
 /* ─── Responsive Hook ─── */
 function useMedia(){
   const[w,sW]=useState(typeof window!=="undefined"?window.innerWidth:1200);
@@ -156,28 +189,53 @@ function OrgChart(){
   const[step,setStep]=useState(0);
   const[clicked,setClicked]=useState(null);
   const{mob}=useMedia();
-  const sc = mob ? 1 : 1.45; // scale factor for desktop
   useEffect(()=>{const ts=[setTimeout(()=>setStep(1),400),setTimeout(()=>setStep(2),900),setTimeout(()=>setStep(3),1400),setTimeout(()=>setStep(4),2000),setTimeout(()=>setStep(5),2600)];return()=>ts.forEach(clearTimeout)},[]);
-  const ns=d=>({opacity:step>=d?1:0,transform:step>=d?"scale(1)":"scale(0)",transition:"all .5s cubic-bezier(.34,1.56,.64,1)"});
-  const ls=d=>({strokeDasharray:100,strokeDashoffset:step>=d?0:100,transition:"stroke-dashoffset .8s ease-out"});
-  const nodes=[{id:"ceo",lb:"CEO",x:115,y:8,w:44,d:1,tip:"Decision maker. Budget authority for enterprise deals."},{id:"vps",lb:"VP Sales",x:40,y:70,w:46,d:2,tip:"Primary champion. Has $2M discretionary budget."},{id:"vpo",lb:"VP Ops",x:190,y:70,w:46,d:2,tip:"Operational gatekeeper. Manages vendor approvals."}];
-  const leafs=[{id:"d1",lb:"Dir.",x:10,y:130,d:3,tip:"Analytics team lead. Technical evaluator."},{id:"d2",lb:"Mgr.",x:72,y:130,d:3,tip:"Influenced 3 past vendor selections."},{id:"d3",lb:"Lead",x:160,y:130,d:4,tip:"Digital transformation project lead."},{id:"d4",lb:"Eng.",x:222,y:130,d:4,tip:"Integration architect. Runs technical POC."}];
-  const all=[...nodes,...leafs];
-  const S=v=>Math.round(v*sc); // scale helper
+  const ns=d=>({opacity:step>=d?1:0,transform:step>=d?"scale(1)":"scale(0)",transition:"all .5s cubic-bezier(.34,1.56,.64,1)",transformOrigin:"center"});
+  const ls=d=>({strokeDasharray:200,strokeDashoffset:step>=d?0:200,transition:"stroke-dashoffset .8s ease-out"});
+
+  const nodeData=[
+    {id:"ceo",cx:200,cy:45,r:28,lb:"CEO",fs:14,fc:C.navy,fill:`url(#ng)`,stroke:"none",d:1,tip:"Decision maker. Budget authority for enterprise deals."},
+    {id:"vps",cx:90,cy:135,r:26,lb:"VP Sales",fs:10,fc:C.teal,fill:C.card,stroke:C.teal,d:2,tip:"Primary champion. Has $2M discretionary budget."},
+    {id:"vpo",cx:310,cy:135,r:26,lb:"VP Ops",fs:10,fc:C.blue,fill:C.card,stroke:C.blue,d:2,tip:"Operational gatekeeper. Manages vendor approvals."},
+    {id:"d1",cx:30,cy:225,r:20,lb:"Dir.",fs:9,fc:C.slate,fill:C.navyMid,stroke:C.border,d:3,tip:"Analytics team lead. Technical evaluator."},
+    {id:"d2",cx:110,cy:225,r:20,lb:"Mgr.",fs:9,fc:C.slate,fill:C.navyMid,stroke:C.border,d:3,tip:"Influenced 3 past vendor selections."},
+    {id:"d3",cx:270,cy:225,r:20,lb:"Lead",fs:9,fc:C.slate,fill:C.navyMid,stroke:C.border,d:4,tip:"Digital transformation project lead."},
+    {id:"d4",cx:350,cy:225,r:20,lb:"Eng.",fs:9,fc:C.slate,fill:C.navyMid,stroke:C.border,d:4,tip:"Integration architect. Runs technical POC."},
+  ];
+  const lines=[
+    {x1:200,y1:73,x2:90,y2:109,c:C.teal,w:2,d:2},{x1:200,y1:73,x2:310,y2:109,c:C.teal,w:2,d:2},
+    {x1:90,y1:161,x2:30,y2:205,c:C.blue,w:1.5,d:3},{x1:90,y1:161,x2:110,y2:205,c:C.blue,w:1.5,d:3},
+    {x1:310,y1:161,x2:270,y2:205,c:C.blue,w:1.5,d:4},{x1:310,y1:161,x2:350,y2:205,c:C.blue,w:1.5,d:4},
+  ];
+
   return(
-    <div style={{position:"relative",width:S(280),height:S(220)}}>
-      <svg width={S(280)} height={S(180)} viewBox="0 0 280 180" style={{position:"absolute",top:0,left:0}}>
-        <line x1="137" y1="30" x2="63" y2="82" stroke={C.teal} strokeWidth="1.5" style={ls(2)} opacity=".6"/>
-        <line x1="137" y1="30" x2="213" y2="82" stroke={C.teal} strokeWidth="1.5" style={ls(2)} opacity=".6"/>
-        <line x1="63" y1="100" x2="30" y2="147" stroke={C.blue} strokeWidth="1.2" style={ls(3)} opacity=".4"/>
-        <line x1="63" y1="100" x2="92" y2="147" stroke={C.blue} strokeWidth="1.2" style={ls(3)} opacity=".4"/>
-        <line x1="213" y1="100" x2="180" y2="147" stroke={C.blue} strokeWidth="1.2" style={ls(4)} opacity=".4"/>
-        <line x1="213" y1="100" x2="242" y2="147" stroke={C.blue} strokeWidth="1.2" style={ls(4)} opacity=".4"/>
+    <div style={{width:"100%",maxWidth:480,aspectRatio:"400/280",position:"relative"}}>
+      <svg viewBox="0 0 400 280" style={{width:"100%",height:"100%"}}>
+        <defs>
+          <linearGradient id="ng" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={C.teal}/><stop offset="100%" stopColor={C.blue}/></linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        {lines.map((l,i)=><line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke={l.c} strokeWidth={l.w} opacity=".5" strokeLinecap="round" style={ls(l.d)}/>)}
+        {nodeData.map(n=>(
+          <g key={n.id} onClick={()=>setClicked(clicked===n.id?null:n.id)} style={{cursor:"pointer",...ns(n.d)}}>
+            <circle cx={n.cx} cy={n.cy} r={n.r} fill={n.fill} stroke={n.stroke} strokeWidth={n.stroke==="none"?0:2} filter={clicked===n.id?"url(#glow)":"none"}/>
+            <text x={n.cx} y={n.cy+n.fs/3} textAnchor="middle" fill={n.fc} fontSize={n.fs} fontFamily="Outfit,sans-serif" fontWeight="700">{n.lb}</text>
+          </g>
+        ))}
+        {/* Insight popup inside SVG */}
+        {clicked&&step>=1&&(
+          <foreignObject x="20" y="250" width="360" height="30" style={{animation:"su .3s ease-out"}}>
+            <div style={{background:`${C.card}F0`,border:`1px solid ${C.teal}44`,borderRadius:6,padding:"4px 10px",fontSize:11,fontFamily:FM,color:C.teal,backdropFilter:"blur(8px)",lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+              <span style={{color:C.amber,marginRight:4}}>⚡</span>{nodeData.find(n=>n.id===clicked)?.tip}
+            </div>
+          </foreignObject>
+        )}
+        {!clicked&&step>=5&&(
+          <foreignObject x="230" y="30" width="160" height="24" style={{animation:"su .5s ease-out"}}>
+            <div style={{background:`${C.card}EE`,border:`1px solid ${C.teal}44`,borderRadius:6,padding:"3px 8px",fontSize:10,fontFamily:FM,color:C.teal,textAlign:"center"}}>Click any node</div>
+          </foreignObject>
+        )}
       </svg>
-      {nodes.map(n=>(<div key={n.id} onClick={()=>setClicked(clicked===n.id?null:n.id)} style={{...ns(n.d),position:"absolute",left:S(n.x),top:S(n.y),width:S(n.w),height:S(n.w),borderRadius:"50%",background:n.id==="ceo"?`linear-gradient(135deg,${C.teal},${C.blue})`:C.card,border:n.id==="ceo"?"none":`2px solid ${n.id==="vps"?C.teal:C.blue}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:S(n.id==="ceo"?11:9),fontWeight:700,color:n.id==="ceo"?C.navy:n.id==="vps"?C.teal:C.blue,fontFamily:FH,textAlign:"center",lineHeight:1.1,cursor:"pointer",boxShadow:clicked===n.id?`0 0 14px ${C.teal}55`:"none",transition:"all .3s"}}>{n.lb}</div>))}
-      {leafs.map(n=>(<div key={n.id} onClick={()=>setClicked(clicked===n.id?null:n.id)} style={{...ns(n.d),position:"absolute",left:S(n.x),top:S(n.y),width:S(34),height:S(34),borderRadius:"50%",border:`1.5px solid ${C.border}`,background:C.navyMid,display:"flex",alignItems:"center",justifyContent:"center",fontSize:S(8),fontWeight:500,color:C.slate,fontFamily:FH,cursor:"pointer",boxShadow:clicked===n.id?`0 0 10px ${C.blue}44`:"none",transition:"all .3s"}}>{n.lb}</div>))}
-      {clicked?(<div style={{position:"absolute",left:0,right:0,bottom:0,background:`${C.card}F0`,border:`1px solid ${C.teal}44`,borderRadius:8,padding:"8px 12px",fontSize:mob?10:12,fontFamily:FM,color:C.teal,backdropFilter:"blur(8px)",animation:"su .3s ease-out",lineHeight:1.4}}><span style={{color:C.amber,marginRight:4}}>⚡</span>{all.find(n=>n.id===clicked)?.tip}</div>
-      ):step>=5?(<div style={{position:"absolute",right:-4,top:S(30),background:`${C.card}EE`,border:`1px solid ${C.teal}44`,borderRadius:6,padding:"6px 10px",fontSize:mob?9:11,fontFamily:FM,color:C.teal,backdropFilter:"blur(8px)",whiteSpace:"nowrap",animation:"su .5s ease-out"}}>Click any node for AI insight</div>):null}
     </div>
   );
 }
@@ -188,7 +246,7 @@ function Hero(){
   const{mob,tab}=useMedia();
   return(
     <section style={{position:"relative",minHeight:"100vh",display:"flex",alignItems:"center",overflow:"hidden"}}>
-      <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse 80% 60% at 20% 50%,${C.teal}14 0%,transparent 70%),radial-gradient(ellipse 60% 80% at 80% 30%,${C.blue}18 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 60% 80%,${C.purple}0C 0%,transparent 50%),${C.navy}`,backgroundSize:"200% 200%",animation:"gradShift 15s ease-in-out infinite"}}/>
+      <div style={{position:"absolute",inset:0,background:C.navy,opacity:.4}}/>
       <div style={{position:"absolute",inset:0,opacity:.03,backgroundImage:`linear-gradient(${C.white} 1px,transparent 1px),linear-gradient(90deg,${C.white} 1px,transparent 1px)`,backgroundSize:"60px 60px"}}/>
       <div style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:mob?"120px 20px 60px":"140px 24px 80px",display:"grid",gridTemplateColumns:mob?"1fr":"1fr 1fr",gap:mob?32:60,alignItems:"center",width:"100%"}}>
         <div>
@@ -263,11 +321,11 @@ function Platform(){
     <section id="platform" style={{padding:mob?"60px 20px":"100px 24px",maxWidth:1200,margin:"0 auto"}}>
       <Rev><div style={{textAlign:"center",marginBottom:mob?40:72}}><span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>The Platform</span><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?28:42,color:C.white,marginTop:12}}>SalesDendrite in three moves.</h2></div></Rev>
       <div style={{display:"grid",gridTemplateColumns:mob?"1fr":"repeat(3,1fr)",gap:mob?16:24}}>{steps.map((s,i)=>(
-        <Rev key={i} delay={i*.12}><div onClick={()=>setActive(active===i?null:i)} style={{position:"relative",background:active===i?C.cardHover:C.card,border:`1px solid ${active===i?s.color+"66":C.border}`,borderRadius:14,padding:mob?"24px 20px":"36px 28px",overflow:"hidden",transition:"all .4s",cursor:"pointer",transform:active===i?"translateY(-4px)":"none"}}>
+        <Rev key={i} delay={i*.12} style={{height:"100%"}}><div onClick={()=>setActive(active===i?null:i)} style={{position:"relative",background:active===i?C.cardHover:C.card,border:`1px solid ${active===i?s.color+"66":C.border}`,borderRadius:14,padding:mob?"24px 20px":"36px 28px",overflow:"hidden",transition:"all .4s",cursor:"pointer",transform:active===i?"translateY(-4px)":"none",height:"100%",display:"flex",flexDirection:"column"}}>
           <div style={{position:"absolute",top:-20,right:-10,fontFamily:FH,fontWeight:900,fontSize:mob?70:100,color:s.color,opacity:.06,lineHeight:1}}>{s.n}</div>
           <div style={{marginBottom:12}}>{s.icon(s.color)}</div>
           <h3 style={{fontFamily:FH,fontWeight:800,fontSize:mob?18:22,color:s.color,letterSpacing:".05em",marginBottom:10}}>{s.t}</h3>
-          <p style={{fontSize:mob?13:14,color:C.slate,lineHeight:1.7}}>{s.desc}</p>
+          <p style={{fontSize:mob?13:14,color:C.slate,lineHeight:1.7,flex:1}}>{s.desc}</p>
           {active===i&&<div style={{marginTop:14,padding:"12px 14px",background:C.navyMid,borderRadius:10,border:`1px solid ${s.color}33`,fontSize:13,color:C.slateLight,lineHeight:1.7,animation:"su .3s ease-out"}}>{s.detail}</div>}
           <div style={{marginTop:10,fontSize:11,color:s.color,fontWeight:600,opacity:.6}}>{active===i?"↑ Collapse":"↓ Expand"}</div>
         </div></Rev>
@@ -308,7 +366,7 @@ function Demo(){
   useEffect(()=>{setTyping(false);const t=setTimeout(()=>setTyping(true),50);return()=>clearTimeout(t)},[sel,tab]);
 
   return(
-    <section id="demo" style={{padding:mob?"60px 20px":"100px 24px",background:`radial-gradient(ellipse 60% 40% at 30% 50%,${C.teal}08 0%,transparent 70%)`}}>
+    <section id="demo" style={{padding:mob?"60px 20px":"100px 24px"}}>
       <div style={{maxWidth:1200,margin:"0 auto"}}>
         <Rev><div style={{textAlign:"center",marginBottom:mob?32:56}}><span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>See It In Action</span><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?26:42,color:C.white,marginTop:12}}>Select a stakeholder.</h2><p style={{fontSize:mob?14:16,color:C.slate,marginTop:8,maxWidth:500,margin:"8px auto 0"}}>Click any person, switch tabs to see different AI outputs.</p></div></Rev>
         <Rev delay={.1}>
@@ -397,12 +455,12 @@ function Why(){
     {ic:Ic.chart,t:"Financially-Aware Engagement",d:"Revenue trends and pipeline data flow into every AI interaction."},
   ];
   return(
-    <section id="why" style={{padding:mob?"60px 20px":"100px 24px",background:`radial-gradient(ellipse 50% 40% at 50% 0%,${C.blue}0A 0%,transparent 70%),${C.navyMid}`}}>
+    <section id="why" style={{padding:mob?"60px 20px":"100px 24px"}}>
       <div style={{maxWidth:1200,margin:"0 auto"}}>
         <Rev><div style={{textAlign:"center",marginBottom:mob?32:48}}><span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>Why SalesDendrite</span><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?26:42,color:C.white,marginTop:12}}>Four data layers converge into execution.</h2></div></Rev>
         {!mob&&<Rev delay={.1}><div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,flexWrap:"wrap",marginBottom:56,padding:"20px 0"}}>{layers.map((l,i)=>(<React.Fragment key={l}><span style={{fontFamily:FM,fontSize:12,color:C.teal,background:C.teal+"12",border:`1px solid ${C.teal}33`,borderRadius:8,padding:"7px 14px"}}>{l}</span>{i<3&&<span style={{color:C.slate}}>+</span>}</React.Fragment>))}<span style={{color:C.teal,fontSize:18,margin:"0 6px"}}>→</span><span style={{fontFamily:FH,fontWeight:800,fontSize:14,background:`linear-gradient(135deg,${C.teal},${C.blue})`,color:C.navy,borderRadius:8,padding:"9px 18px"}}>Execution Intelligence</span></div></Rev>}
         <div style={{display:"grid",gridTemplateColumns:mob?"1fr":"repeat(3,1fr)",gap:mob?14:20}}>{bs.map((b,i)=>(
-          <Rev key={i} delay={i*.06}><div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:mob?"20px":"26px 22px",transition:"all .3s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=C.teal+"44"}} onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border}}>
+          <Rev key={i} delay={i*.06} style={{height:"100%"}}><div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:mob?"20px":"26px 22px",transition:"all .3s",height:"100%"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=C.teal+"44"}} onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border}}>
             <div style={{marginBottom:8}}>{b.ic(C.teal)}</div>
             <h3 style={{fontFamily:FH,fontWeight:700,fontSize:mob?14:15,color:C.white,marginBottom:5}}>{b.t}</h3>
             <p style={{fontSize:mob?12:13,color:C.slate,lineHeight:1.7}}>{b.d}</p>
@@ -471,7 +529,7 @@ function Contact(){
   };
 
   return(
-    <section id="contact" style={{padding:mob?"60px 20px":"100px 24px",background:`radial-gradient(ellipse 60% 50% at 50% 100%,${C.teal}0C 0%,transparent 70%)`}}>
+    <section id="contact" style={{padding:mob?"60px 20px":"100px 24px"}}>
       <div style={{maxWidth:560,margin:"0 auto",textAlign:"center"}}>
         <Rev><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?28:42,color:C.white,marginBottom:12}}>Let's put this on your account.</h2><p style={{fontSize:mob?14:16,color:C.slate,marginBottom:32,lineHeight:1.7}}>Pick one account. Upload the org chart. Let the platform do its thing.</p></Rev>
         {done?(
@@ -509,6 +567,6 @@ function Foot(){
 /* ═══════════ APP ═══════════ */
 export default function App(){return(
   <div style={{minHeight:"100vh"}}>
-    <Sty/><CursorGlow/><Particles/><Nav/><Hero/><Stats/><Problem/><Platform/><Demo/><Modules/><Why/><Carousel/><Compare/><Contact/><Foot/>
+    <Sty/><FlowingBG/><CursorGlow/><Particles/><Nav/><Hero/><Stats/><Problem/><Platform/><Demo/><Modules/><Why/><Carousel/><Compare/><Contact/><Foot/>
   </div>
 )}
