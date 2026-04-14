@@ -12,6 +12,10 @@ body{background:${C.navy};color:${C.slateLight};font-family:${FB};line-height:1.
 @keyframes pg{0%,100%{opacity:.4}50%{opacity:.9}}
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes fd{from{stroke-dashoffset:20}to{stroke-dashoffset:0}}
+@keyframes float1{0%,100%{transform:translateY(0) translateX(0)}25%{transform:translateY(-20px) translateX(10px)}50%{transform:translateY(-10px) translateX(-8px)}75%{transform:translateY(-25px) translateX(5px)}}
+@keyframes float2{0%,100%{transform:translateY(0) translateX(0)}33%{transform:translateY(-15px) translateX(-12px)}66%{transform:translateY(-8px) translateX(15px)}}
+@keyframes float3{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .gt{background:linear-gradient(135deg,${C.teal},${C.blue});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .gb{background:linear-gradient(135deg,${C.teal},${C.blue});color:${C.white};border:none;cursor:pointer;transition:all .3s}
 .gb:hover{transform:translateY(-2px);box-shadow:0 8px 30px ${C.teal}44}
@@ -20,6 +24,37 @@ body{background:${C.navy};color:${C.slateLight};font-family:${FB};line-height:1.
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:${C.navy}}::-webkit-scrollbar-thumb{background:${C.border};border-radius:3px}`;
 
 function Sty(){useEffect(()=>{if(!document.getElementById("sd")){const s=document.createElement("style");s.id="sd";s.textContent=CSS;document.head.appendChild(s)}},[]);return null}
+
+/* ─── Cursor Glow ─── */
+function CursorGlow(){
+  const[pos,setPos]=useState({x:-100,y:-100});
+  const{mob}=useMedia();
+  useEffect(()=>{
+    if(mob)return;
+    const h=e=>setPos({x:e.clientX,y:e.clientY});
+    window.addEventListener("mousemove",h);
+    return()=>window.removeEventListener("mousemove",h);
+  },[mob]);
+  if(mob)return null;
+  return(<div style={{position:"fixed",left:pos.x-150,top:pos.y-150,width:300,height:300,borderRadius:"50%",background:`radial-gradient(circle,${C.teal}12 0%,${C.blue}08 40%,transparent 70%)`,pointerEvents:"none",zIndex:9999,transition:"left .15s ease-out, top .15s ease-out",filter:"blur(2px)"}}/>);
+}
+
+/* ─── Floating Particles ─── */
+function Particles(){
+  const dots = [
+    {x:"10%",y:"20%",s:3,d:"8s",a:"float1",o:.15},
+    {x:"85%",y:"15%",s:4,d:"12s",a:"float2",o:.1},
+    {x:"20%",y:"60%",s:2,d:"10s",a:"float3",o:.12},
+    {x:"70%",y:"45%",s:3,d:"9s",a:"float1",o:.08},
+    {x:"50%",y:"80%",s:2,d:"11s",a:"float2",o:.1},
+    {x:"90%",y:"70%",s:3,d:"7s",a:"float3",o:.12},
+    {x:"35%",y:"30%",s:2,d:"13s",a:"float1",o:.06},
+    {x:"60%",y:"90%",s:4,d:"10s",a:"float2",o:.08},
+  ];
+  return(<div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:1,overflow:"hidden"}}>
+    {dots.map((d,i)=>(<div key={i} style={{position:"absolute",left:d.x,top:d.y,width:d.s,height:d.s,borderRadius:"50%",background:i%2===0?C.teal:C.blue,opacity:d.o,animation:`${d.a} ${d.d} ease-in-out infinite`,animationDelay:`${i*0.7}s`}}/>))}
+  </div>);
+}
 
 /* ─── Responsive Hook ─── */
 function useMedia(){
@@ -120,15 +155,18 @@ const ROLES={
 function OrgChart(){
   const[step,setStep]=useState(0);
   const[clicked,setClicked]=useState(null);
+  const{mob}=useMedia();
+  const sc = mob ? 1 : 1.45; // scale factor for desktop
   useEffect(()=>{const ts=[setTimeout(()=>setStep(1),400),setTimeout(()=>setStep(2),900),setTimeout(()=>setStep(3),1400),setTimeout(()=>setStep(4),2000),setTimeout(()=>setStep(5),2600)];return()=>ts.forEach(clearTimeout)},[]);
   const ns=d=>({opacity:step>=d?1:0,transform:step>=d?"scale(1)":"scale(0)",transition:"all .5s cubic-bezier(.34,1.56,.64,1)"});
   const ls=d=>({strokeDasharray:100,strokeDashoffset:step>=d?0:100,transition:"stroke-dashoffset .8s ease-out"});
-  const nodes=[{id:"ceo",lb:"CEO",x:115,y:8,w:44,d:1,tip:"Decision maker. Budget authority."},{id:"vps",lb:"VP Sales",x:40,y:70,w:46,d:2,tip:"Primary champion. $2M budget."},{id:"vpo",lb:"VP Ops",x:190,y:70,w:46,d:2,tip:"Operational gatekeeper."}];
-  const leafs=[{id:"d1",lb:"Dir.",x:10,y:130,d:3,tip:"Technical evaluator."},{id:"d2",lb:"Mgr.",x:72,y:130,d:3,tip:"Influenced 3 vendor selections."},{id:"d3",lb:"Lead",x:160,y:130,d:4,tip:"Digital transformation lead."},{id:"d4",lb:"Eng.",x:222,y:130,d:4,tip:"Runs technical POC."}];
+  const nodes=[{id:"ceo",lb:"CEO",x:115,y:8,w:44,d:1,tip:"Decision maker. Budget authority for enterprise deals."},{id:"vps",lb:"VP Sales",x:40,y:70,w:46,d:2,tip:"Primary champion. Has $2M discretionary budget."},{id:"vpo",lb:"VP Ops",x:190,y:70,w:46,d:2,tip:"Operational gatekeeper. Manages vendor approvals."}];
+  const leafs=[{id:"d1",lb:"Dir.",x:10,y:130,d:3,tip:"Analytics team lead. Technical evaluator."},{id:"d2",lb:"Mgr.",x:72,y:130,d:3,tip:"Influenced 3 past vendor selections."},{id:"d3",lb:"Lead",x:160,y:130,d:4,tip:"Digital transformation project lead."},{id:"d4",lb:"Eng.",x:222,y:130,d:4,tip:"Integration architect. Runs technical POC."}];
   const all=[...nodes,...leafs];
+  const S=v=>Math.round(v*sc); // scale helper
   return(
-    <div style={{position:"relative",width:280,height:220}}>
-      <svg width="280" height="180" viewBox="0 0 280 180" style={{position:"absolute",top:0,left:0}}>
+    <div style={{position:"relative",width:S(280),height:S(220)}}>
+      <svg width={S(280)} height={S(180)} viewBox="0 0 280 180" style={{position:"absolute",top:0,left:0}}>
         <line x1="137" y1="30" x2="63" y2="82" stroke={C.teal} strokeWidth="1.5" style={ls(2)} opacity=".6"/>
         <line x1="137" y1="30" x2="213" y2="82" stroke={C.teal} strokeWidth="1.5" style={ls(2)} opacity=".6"/>
         <line x1="63" y1="100" x2="30" y2="147" stroke={C.blue} strokeWidth="1.2" style={ls(3)} opacity=".4"/>
@@ -136,10 +174,10 @@ function OrgChart(){
         <line x1="213" y1="100" x2="180" y2="147" stroke={C.blue} strokeWidth="1.2" style={ls(4)} opacity=".4"/>
         <line x1="213" y1="100" x2="242" y2="147" stroke={C.blue} strokeWidth="1.2" style={ls(4)} opacity=".4"/>
       </svg>
-      {nodes.map(n=>(<div key={n.id} onClick={()=>setClicked(clicked===n.id?null:n.id)} style={{...ns(n.d),position:"absolute",left:n.x,top:n.y,width:n.w,height:n.w,borderRadius:"50%",background:n.id==="ceo"?`linear-gradient(135deg,${C.teal},${C.blue})`:C.card,border:n.id==="ceo"?"none":`2px solid ${n.id==="vps"?C.teal:C.blue}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:n.id==="ceo"?10:8,fontWeight:700,color:n.id==="ceo"?C.navy:n.id==="vps"?C.teal:C.blue,fontFamily:FH,textAlign:"center",lineHeight:1.1,cursor:"pointer",boxShadow:clicked===n.id?`0 0 14px ${C.teal}55`:"none",transition:"all .3s"}}>{n.lb}</div>))}
-      {leafs.map(n=>(<div key={n.id} onClick={()=>setClicked(clicked===n.id?null:n.id)} style={{...ns(n.d),position:"absolute",left:n.x,top:n.y,width:34,height:34,borderRadius:"50%",border:`1.5px solid ${C.border}`,background:C.navyMid,display:"flex",alignItems:"center",justifyContent:"center",fontSize:7,fontWeight:500,color:C.slate,fontFamily:FH,cursor:"pointer",boxShadow:clicked===n.id?`0 0 10px ${C.blue}44`:"none",transition:"all .3s"}}>{n.lb}</div>))}
-      {clicked?(<div style={{position:"absolute",left:0,right:0,bottom:0,background:`${C.card}F0`,border:`1px solid ${C.teal}44`,borderRadius:8,padding:"6px 10px",fontSize:10,fontFamily:FM,color:C.teal,backdropFilter:"blur(8px)",animation:"su .3s ease-out",lineHeight:1.4}}><span style={{color:C.amber,marginRight:4}}>⚡</span>{all.find(n=>n.id===clicked)?.tip}</div>
-      ):step>=5?(<div style={{position:"absolute",right:-4,top:30,background:`${C.card}EE`,border:`1px solid ${C.teal}44`,borderRadius:6,padding:"6px 10px",fontSize:9,fontFamily:FM,color:C.teal,backdropFilter:"blur(8px)",whiteSpace:"nowrap",animation:"su .5s ease-out"}}>Click any node</div>):null}
+      {nodes.map(n=>(<div key={n.id} onClick={()=>setClicked(clicked===n.id?null:n.id)} style={{...ns(n.d),position:"absolute",left:S(n.x),top:S(n.y),width:S(n.w),height:S(n.w),borderRadius:"50%",background:n.id==="ceo"?`linear-gradient(135deg,${C.teal},${C.blue})`:C.card,border:n.id==="ceo"?"none":`2px solid ${n.id==="vps"?C.teal:C.blue}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:S(n.id==="ceo"?11:9),fontWeight:700,color:n.id==="ceo"?C.navy:n.id==="vps"?C.teal:C.blue,fontFamily:FH,textAlign:"center",lineHeight:1.1,cursor:"pointer",boxShadow:clicked===n.id?`0 0 14px ${C.teal}55`:"none",transition:"all .3s"}}>{n.lb}</div>))}
+      {leafs.map(n=>(<div key={n.id} onClick={()=>setClicked(clicked===n.id?null:n.id)} style={{...ns(n.d),position:"absolute",left:S(n.x),top:S(n.y),width:S(34),height:S(34),borderRadius:"50%",border:`1.5px solid ${C.border}`,background:C.navyMid,display:"flex",alignItems:"center",justifyContent:"center",fontSize:S(8),fontWeight:500,color:C.slate,fontFamily:FH,cursor:"pointer",boxShadow:clicked===n.id?`0 0 10px ${C.blue}44`:"none",transition:"all .3s"}}>{n.lb}</div>))}
+      {clicked?(<div style={{position:"absolute",left:0,right:0,bottom:0,background:`${C.card}F0`,border:`1px solid ${C.teal}44`,borderRadius:8,padding:"8px 12px",fontSize:mob?10:12,fontFamily:FM,color:C.teal,backdropFilter:"blur(8px)",animation:"su .3s ease-out",lineHeight:1.4}}><span style={{color:C.amber,marginRight:4}}>⚡</span>{all.find(n=>n.id===clicked)?.tip}</div>
+      ):step>=5?(<div style={{position:"absolute",right:-4,top:S(30),background:`${C.card}EE`,border:`1px solid ${C.teal}44`,borderRadius:6,padding:"6px 10px",fontSize:mob?9:11,fontFamily:FM,color:C.teal,backdropFilter:"blur(8px)",whiteSpace:"nowrap",animation:"su .5s ease-out"}}>Click any node for AI insight</div>):null}
     </div>
   );
 }
@@ -150,7 +188,7 @@ function Hero(){
   const{mob,tab}=useMedia();
   return(
     <section style={{position:"relative",minHeight:"100vh",display:"flex",alignItems:"center",overflow:"hidden"}}>
-      <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse 80% 60% at 20% 50%,${C.teal}12 0%,transparent 70%),radial-gradient(ellipse 60% 80% at 80% 30%,${C.blue}15 0%,transparent 60%),${C.navy}`}}/>
+      <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse 80% 60% at 20% 50%,${C.teal}14 0%,transparent 70%),radial-gradient(ellipse 60% 80% at 80% 30%,${C.blue}18 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 60% 80%,${C.purple}0C 0%,transparent 50%),${C.navy}`,backgroundSize:"200% 200%",animation:"gradShift 15s ease-in-out infinite"}}/>
       <div style={{position:"absolute",inset:0,opacity:.03,backgroundImage:`linear-gradient(${C.white} 1px,transparent 1px),linear-gradient(90deg,${C.white} 1px,transparent 1px)`,backgroundSize:"60px 60px"}}/>
       <div style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:mob?"120px 20px 60px":"140px 24px 80px",display:"grid",gridTemplateColumns:mob?"1fr":"1fr 1fr",gap:mob?32:60,alignItems:"center",width:"100%"}}>
         <div>
@@ -202,7 +240,7 @@ function Problem(){
     <section style={{padding:mob?"60px 20px":"100px 24px",maxWidth:1200,margin:"0 auto"}}>
       <Rev><div style={{textAlign:"center",marginBottom:mob?40:64}}><span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.red}}>The Problem</span><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?28:42,color:C.white,marginTop:12,maxWidth:700,margin:"12px auto 0"}}>Every sales tool gives you data.<br/>None of them give you the org.</h2></div></Rev>
       <div style={{display:"grid",gridTemplateColumns:mob?"1fr":"1fr 1fr",gap:mob?14:20}}>{ps.map((p,i)=>(
-        <Rev key={i} delay={i*.1}><div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`3px solid ${p.color}`,borderRadius:12,padding:mob?"20px":"28px",transition:"all .3s"}} onMouseEnter={e=>{e.currentTarget.style.background=C.cardHover}} onMouseLeave={e=>{e.currentTarget.style.background=C.card}}>
+        <Rev key={i} delay={i*.1} style={{height:"100%"}}><div style={{background:C.card,border:`1px solid ${C.border}`,borderLeft:`3px solid ${p.color}`,borderRadius:12,padding:mob?"20px":"28px",transition:"all .3s",height:"100%",display:"flex",flexDirection:"column"}} onMouseEnter={e=>{e.currentTarget.style.background=C.cardHover}} onMouseLeave={e=>{e.currentTarget.style.background=C.card}}>
           <div style={{marginBottom:10}}>{p.icon(p.color)}</div>
           <h3 style={{fontFamily:FH,fontWeight:700,fontSize:mob?16:18,color:C.white,marginBottom:6}}>{p.title}</h3>
           <p style={{fontSize:mob?13:14,color:C.slate,lineHeight:1.7}}>{p.desc}</p>
@@ -471,6 +509,6 @@ function Foot(){
 /* ═══════════ APP ═══════════ */
 export default function App(){return(
   <div style={{minHeight:"100vh"}}>
-    <Sty/><Nav/><Hero/><Stats/><Problem/><Platform/><Demo/><Modules/><Why/><Carousel/><Compare/><Contact/><Foot/>
+    <Sty/><CursorGlow/><Particles/><Nav/><Hero/><Stats/><Problem/><Platform/><Demo/><Modules/><Why/><Carousel/><Compare/><Contact/><Foot/>
   </div>
 )}
