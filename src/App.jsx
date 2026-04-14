@@ -308,28 +308,84 @@ function Problem(){
   );
 }
 
-/* ═══════════ PLATFORM ═══════════ */
+/* ═══════════ PLATFORM — clean scroll-driven flow ═══════════ */
 function Platform(){
-  const[active,setActive]=useState(null);
   const{mob}=useMedia();
+  const sectionRef=useRef(null);
+  const[progress,setProgress]=useState(0);
+
+  useEffect(()=>{
+    const el=sectionRef.current;if(!el)return;
+    const h=()=>{
+      const r=el.getBoundingClientRect();
+      const vh=window.innerHeight;
+      const start=vh*0.75;
+      const end=vh*0.1;
+      const p=Math.max(0,Math.min(1,(start-r.top)/(start-end)));
+      setProgress(p);
+    };
+    window.addEventListener("scroll",h,{passive:true});
+    h();
+    return()=>window.removeEventListener("scroll",h);
+  },[]);
+
   const steps=[
-    {n:"01",icon:Ic.map,t:"MAP",desc:"Upload org charts in any format. Build the hierarchy your CRM doesn't have.",detail:"Supports PDF, PNG, CSV, LinkedIn exports. AI auto-detects roles and reporting lines.",color:C.teal},
-    {n:"02",icon:Ic.search,t:"UNDERSTAND",desc:"Layer financial analysis, clinical pipeline, regulatory milestones, and competitive intel.",detail:"SEC filings auto-parsed. ClinicalTrials.gov integration. News monitoring with AI summarization.",color:C.blue},
-    {n:"03",icon:Ic.zap,t:"EXECUTE",desc:"AI generates conversion strategies, drafts emails, preps meetings, and builds account plans.",detail:"Full context injection from all 4 data layers. Personalized per stakeholder.",color:C.amber},
+    {n:"01",icon:Ic.map,t:"MAP",desc:"Upload org charts. Build the hierarchy your CRM doesn't have. See who reports to whom.",color:C.teal},
+    {n:"02",icon:Ic.search,t:"UNDERSTAND",desc:"Layer financial analysis, clinical pipeline, regulatory milestones, and competitive intel onto every account.",color:C.blue},
+    {n:"03",icon:Ic.zap,t:"EXECUTE",desc:"AI generates conversion strategies, drafts emails, preps meetings — all grounded in real account data.",color:C.amber},
   ];
+
+  const ease=t=>t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  const cardAnim=(i)=>{
+    const stagger=i*0.15;
+    const raw=Math.max(0,Math.min(1,(progress-stagger)*4));
+    const e=ease(raw);
+    return{opacity:mob?1:Math.max(0.1,e),transform:mob?"none":`translateY(${(1-e)*24}px)`,transition:"opacity .06s, transform .06s"};
+  };
+  const lineWidth=()=>mob?0:Math.min(100,progress*140)+"%";
+
   return(
-    <section id="platform" style={{padding:mob?"60px 20px":"100px 24px",maxWidth:1200,margin:"0 auto"}}>
-      <Rev><div style={{textAlign:"center",marginBottom:mob?40:72}}><span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>The Platform</span><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?28:42,color:C.white,marginTop:12}}>SalesDendrite in three moves.</h2></div></Rev>
-      <div style={{display:"grid",gridTemplateColumns:mob?"1fr":"repeat(3,1fr)",gap:mob?16:24}}>{steps.map((s,i)=>(
-        <Rev key={i} delay={i*.12} style={{height:"100%"}}><div onClick={()=>setActive(active===i?null:i)} style={{position:"relative",background:active===i?C.cardHover:C.card,border:`1px solid ${active===i?s.color+"66":C.border}`,borderRadius:14,padding:mob?"24px 20px":"36px 28px",overflow:"hidden",transition:"all .4s",cursor:"pointer",transform:active===i?"translateY(-4px)":"none",height:"100%",display:"flex",flexDirection:"column"}}>
-          <div style={{position:"absolute",top:-20,right:-10,fontFamily:FH,fontWeight:900,fontSize:mob?70:100,color:s.color,opacity:.06,lineHeight:1}}>{s.n}</div>
-          <div style={{marginBottom:12}}>{s.icon(s.color)}</div>
-          <h3 style={{fontFamily:FH,fontWeight:800,fontSize:mob?18:22,color:s.color,letterSpacing:".05em",marginBottom:10}}>{s.t}</h3>
-          <p style={{fontSize:mob?13:14,color:C.slate,lineHeight:1.7,flex:1}}>{s.desc}</p>
-          {active===i&&<div style={{marginTop:14,padding:"12px 14px",background:C.navyMid,borderRadius:10,border:`1px solid ${s.color}33`,fontSize:13,color:C.slateLight,lineHeight:1.7,animation:"su .3s ease-out"}}>{s.detail}</div>}
-          <div style={{marginTop:10,fontSize:11,color:s.color,fontWeight:600,opacity:.6}}>{active===i?"↑ Collapse":"↓ Expand"}</div>
-        </div></Rev>
-      ))}</div>
+    <section id="platform" ref={sectionRef} style={{padding:mob?"60px 20px":"100px 24px",maxWidth:1400,margin:"0 auto"}}>
+      <Rev><div style={{textAlign:"center",marginBottom:mob?36:60}}>
+        <span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>The Platform</span>
+        <h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?28:42,color:C.white,marginTop:12}}>Three moves. One outcome.</h2>
+      </div></Rev>
+
+      {/* Connecting gradient line (desktop only) */}
+      {!mob&&(
+        <div style={{position:"relative",maxWidth:1000,margin:"0 auto 48px",height:4,background:C.border+"44",borderRadius:2,overflow:"hidden"}}>
+          <div style={{height:"100%",borderRadius:2,background:`linear-gradient(90deg,${C.teal},${C.blue},${C.amber})`,width:lineWidth(),transition:"width .1s ease-out"}}/>
+          {/* Step dots on the line */}
+          {steps.map((s,i)=>{
+            const pos=i*50; // 0%, 50%, 100%
+            const dotP=Math.max(0,Math.min(1,(progress-i*0.12)*5));
+            return <div key={i} style={{position:"absolute",left:`${pos}%`,top:"50%",transform:"translate(-50%,-50%)",width:dotP>0.5?14:8,height:dotP>0.5?14:8,borderRadius:"50%",background:s.color,border:`2px solid ${C.navy}`,transition:"all .3s",boxShadow:dotP>0.8?`0 0 12px ${s.color}66`:"none"}}/>;
+          })}
+        </div>
+      )}
+
+      <div style={{display:"grid",gridTemplateColumns:mob?"1fr":"repeat(3,1fr)",gap:mob?16:28,maxWidth:1000,margin:"0 auto"}}>
+        {steps.map((s,i)=>(
+          <div key={i} style={{...cardAnim(i),background:`${C.card}CC`,backdropFilter:"blur(16px)",border:`1px solid ${C.border}`,borderRadius:16,padding:mob?"24px 20px":"32px 28px",position:"relative",overflow:"hidden"}}>
+            {/* Accent top glow */}
+            <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${s.color},transparent)`}}/>
+            
+            {/* Step number */}
+            <div style={{position:"absolute",top:-10,right:-5,fontFamily:FH,fontWeight:900,fontSize:mob?60:72,color:s.color,opacity:.05,lineHeight:1}}>{s.n}</div>
+
+            {/* Icon circle */}
+            <div style={{width:52,height:52,borderRadius:14,background:`${s.color}12`,border:`1px solid ${s.color}30`,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:16}}>
+              {s.icon(s.color)}
+            </div>
+
+            {/* Title */}
+            <h3 style={{fontFamily:FH,fontWeight:800,fontSize:mob?20:22,color:s.color,letterSpacing:".03em",marginBottom:10}}>{s.t}</h3>
+
+            {/* Description */}
+            <p style={{fontSize:mob?13:14,color:C.slate,lineHeight:1.7}}>{s.desc}</p>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
@@ -413,31 +469,113 @@ function Demo(){
 }
 
 /* ═══════════ MODULES ═══════════ */
+/* ═══════════ MODULES — hover expand + liquid glass ═══════════ */
 function Modules(){
-  const[ex,setEx]=useState(null);
+  const[hov,setHov]=useState(null);
   const{mob,tab:isTab}=useMedia();
   const ms=[
-    {ic:Ic.users,n:"Stakeholder Directory",d:"Full org with hierarchy inference, engagement scoring.",dt:"Upload org charts in PDF, PNG, CSV. AI infers reporting lines.",c:C.teal},
-    {ic:Ic.news,n:"Public Intelligence",d:"Financial analysis, clinical pipeline, milestones — AI-summarised.",dt:"SEC 10-K auto-parsed. ClinicalTrials.gov sync. FDA calendar.",c:C.blue},
-    {ic:Ic.brain,n:"Intel Hub",d:"Meeting notes, competitive intel. Institutional memory.",dt:"Structured insight capture. Survives rep transitions.",c:C.amber},
-    {ic:Ic.ai,n:"AI Workspace",d:"Claude-powered partner with full account context.",dt:"Every response draws from org, financials, capabilities.",c:C.purple},
-    {ic:Ic.target,n:"Buying Committee",d:"Map Champion, Decision Maker, Blocker. See gaps.",dt:"Role assignment with AI. Coverage gap analysis.",c:C.teal},
-    {ic:Ic.people,n:"Target Stakeholders",d:"AI conversion strategies, path-to-influence mapping.",dt:"Per-stakeholder action plans. Engagement playbooks.",c:C.red},
-    {ic:Ic.chart,n:"Capability Intelligence",d:"Service library, case studies, opportunity matching.",dt:"AI matches capabilities to stakeholder needs.",c:C.blue},
-    {ic:Ic.gear,n:"Settings & RBAC",d:"Multi-user auth, CRM connectors, brand templates.",dt:"Salesforce, HubSpot, Veeva, Dynamics sync.",c:C.slate},
+    {ic:Ic.users,n:"Stakeholder Directory",d:"Full org with hierarchy inference, engagement scoring.",dt:"Upload org charts in PDF, PNG, CSV. AI auto-infers reporting lines. Track engagement over time. Visualize relationship networks across the account.",c:C.teal,emoji:"👥"},
+    {ic:Ic.news,n:"Public Intelligence",d:"Financial analysis, clinical pipeline, milestones — AI-summarised.",dt:"SEC 10-K/10-Q auto-parsed. ClinicalTrials.gov sync. FDA calendar integration. AI generates narrative briefs per account.",c:C.blue,emoji:"📰"},
+    {ic:Ic.brain,n:"Intel Hub",d:"Meeting notes, competitive intel. Institutional memory.",dt:"Structured capture of meeting insights. Competitive landscape tracking. Initiative mapping to stakeholders. Survives rep transitions.",c:C.amber,emoji:"🧠"},
+    {ic:Ic.ai,n:"AI Workspace",d:"Claude-powered partner with full account context.",dt:"Every AI response draws from org structure, financials, stakeholders, capabilities. A contextual sales strategist, not a chatbot.",c:C.purple,emoji:"🤖"},
+    {ic:Ic.target,n:"Buying Committee",d:"Map Champion, Decision Maker, Blocker. See gaps.",dt:"Role assignment with AI suggestions. Coverage gap analysis. Risk scoring per committee member. AI flags missing roles.",c:C.teal,emoji:"🎯"},
+    {ic:Ic.people,n:"Target Stakeholders",d:"AI conversion strategies, path-to-influence mapping.",dt:"Per-stakeholder action plans. Influence path mapping between contacts. Engagement playbooks generated from account context.",c:C.red,emoji:"🎪"},
+    {ic:Ic.chart,n:"Capability Intelligence",d:"Service library, case studies, opportunity matching.",dt:"Upload your capability library. AI matches capabilities to stakeholder needs and active initiatives. Auto-generates positioning.",c:C.blue,emoji:"📊"},
+    {ic:Ic.gear,n:"Settings & RBAC",d:"Multi-user auth, CRM connectors, brand templates.",dt:"Role-based access control. API key management. Salesforce, HubSpot, Veeva, Dynamics 365 sync. White-label brand templates.",c:C.slate,emoji:"⚙️"},
   ];
   const cols=mob?"repeat(2,1fr)":isTab?"repeat(3,1fr)":"repeat(4,1fr)";
+
   return(
-    <section id="modules" style={{padding:mob?"60px 20px":"100px 24px",maxWidth:1200,margin:"0 auto"}}>
-      <Rev><div style={{textAlign:"center",marginBottom:mob?40:64}}><span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>Platform Modules</span><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?26:42,color:C.white,marginTop:12}}>Seven modules. One data layer.</h2></div></Rev>
-      <div style={{display:"grid",gridTemplateColumns:cols,gap:mob?10:16}}>{ms.map((m,i)=>(
-        <Rev key={i} delay={i*.04}><div onClick={()=>setEx(ex===i?null:i)} style={{background:ex===i?C.cardHover:C.card,border:`1px solid ${ex===i?m.c+"55":C.border}`,borderTop:`2px solid ${m.c}`,borderRadius:10,padding:mob?"16px 14px":"22px 18px",transition:"all .4s",cursor:"pointer"}}>
-          <div style={{marginBottom:8}}>{m.ic(m.c)}</div>
-          <h3 style={{fontFamily:FH,fontWeight:700,fontSize:mob?13:14,color:C.white,marginBottom:5}}>{m.n}</h3>
-          <p style={{fontSize:mob?11:12,color:C.slate,lineHeight:1.5}}>{m.d}</p>
-          {ex===i&&<div style={{marginTop:8,padding:"8px 10px",background:C.navyMid,borderRadius:6,fontSize:11,color:C.slateLight,lineHeight:1.5,animation:"su .3s ease-out"}}>{m.dt}</div>}
-        </div></Rev>
-      ))}</div>
+    <section id="modules" style={{padding:mob?"60px 20px":"100px 24px",maxWidth:1400,margin:"0 auto"}}>
+      <Rev><div style={{textAlign:"center",marginBottom:mob?40:64}}>
+        <span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>Platform Modules</span>
+        <h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?26:42,color:C.white,marginTop:12}}>Seven modules. One data layer.</h2>
+        {!mob&&<p style={{fontSize:14,color:C.slate,marginTop:8}}>Hover any module to explore</p>}
+      </div></Rev>
+      <div style={{display:"grid",gridTemplateColumns:cols,gap:mob?10:16}}>
+        {ms.map((m,i)=>{
+          const isHov=hov===i;
+          return(
+            <Rev key={i} delay={i*.04} style={{height:"100%"}}>
+              <div
+                onMouseEnter={()=>setHov(i)}
+                onMouseLeave={()=>setHov(null)}
+                onClick={()=>mob&&setHov(hov===i?null:i)}
+                style={{
+                  position:"relative",
+                  borderRadius:16,
+                  padding:mob?"18px 16px":isHov?"28px 24px":"24px 20px",
+                  transition:"all .5s cubic-bezier(.22,1,.36,1)",
+                  cursor:"pointer",
+                  height:"100%",
+                  overflow:"hidden",
+                  /* Liquid glass effect */
+                  background:isHov
+                    ?`linear-gradient(135deg, ${m.c}18 0%, ${C.card}DD 40%, ${m.c}0A 100%)`
+                    :`${C.card}BB`,
+                  backdropFilter:isHov?"blur(24px) saturate(1.4)":"blur(12px) saturate(1.1)",
+                  WebkitBackdropFilter:isHov?"blur(24px) saturate(1.4)":"blur(12px) saturate(1.1)",
+                  border:isHov?`1px solid ${m.c}44`:`1px solid ${C.border}88`,
+                  borderTop:isHov?`2px solid ${m.c}`:`2px solid ${m.c}66`,
+                  boxShadow:isHov
+                    ?`0 8px 32px ${m.c}20, inset 0 1px 0 ${C.white}08, 0 0 0 1px ${m.c}15`
+                    :`inset 0 1px 0 ${C.white}05`,
+                  transform:isHov&&!mob?"translateY(-6px) scale(1.02)":"none",
+                  zIndex:isHov?10:1,
+                }}
+              >
+                {/* Glossy highlight — top edge refraction */}
+                <div style={{
+                  position:"absolute",top:0,left:0,right:0,height:isHov?60:40,
+                  background:`linear-gradient(180deg, ${C.white}${isHov?"0A":"05"} 0%, transparent 100%)`,
+                  borderRadius:"16px 16px 0 0",
+                  transition:"all .5s",
+                  pointerEvents:"none",
+                }}/>
+
+                {/* Content */}
+                <div style={{position:"relative",zIndex:2}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:isHov?12:8,transition:"margin .4s"}}>
+                    <div style={{
+                      width:isHov?42:36,height:isHov?42:36,borderRadius:isHov?12:10,
+                      background:`${m.c}15`,border:`1px solid ${m.c}30`,
+                      display:"flex",alignItems:"center",justifyContent:"center",
+                      transition:"all .4s",
+                    }}>
+                      {m.ic(m.c)}
+                    </div>
+                    <h3 style={{fontFamily:FH,fontWeight:700,fontSize:mob?13:isHov?16:14,color:C.white,transition:"font-size .3s"}}>{m.n}</h3>
+                  </div>
+
+                  <p style={{fontSize:mob?11:12,color:isHov?C.slateLight:C.slate,lineHeight:1.6,transition:"color .3s"}}>{m.d}</p>
+
+                  {/* Expanded detail — slides in on hover */}
+                  <div style={{
+                    maxHeight:isHov?200:0,
+                    opacity:isHov?1:0,
+                    overflow:"hidden",
+                    transition:"max-height .5s cubic-bezier(.22,1,.36,1), opacity .4s ease-out",
+                    marginTop:isHov?12:0,
+                  }}>
+                    <div style={{
+                      padding:"12px 14px",
+                      background:`${C.navy}66`,
+                      backdropFilter:"blur(8px)",
+                      borderRadius:10,
+                      border:`1px solid ${m.c}20`,
+                      fontSize:12,
+                      color:C.slateLight,
+                      lineHeight:1.6,
+                    }}>
+                      {m.dt}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Rev>
+          );
+        })}
+      </div>
     </section>
   );
 }
