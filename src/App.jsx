@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const C = { navy:"#0B1D3A",navyMid:"#0F2847",card:"#0D2240",cardHover:"#112A4D",blue:"#2D7FF9",teal:"#00C9A7",red:"#EF4343",amber:"#F59E0B",purple:"#8B5CF6",slate:"#94A3B8",slateLight:"#CBD5E1",white:"#FFFFFF",border:"#1E3A5F" };
 const FH=`'Outfit',sans-serif`,FB=`'DM Sans',sans-serif`,FM=`'JetBrains Mono',monospace`;
