@@ -209,7 +209,7 @@ function OrgChart(){
   ];
 
   return(
-    <div style={{width:"100%",maxWidth:480,aspectRatio:"400/280",position:"relative"}}>
+    <div style={{width:"100%",aspectRatio:"400/280",position:"relative"}}>
       <svg viewBox="0 0 400 280" style={{width:"100%",height:"100%"}}>
         <defs>
           <linearGradient id="ng" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={C.teal}/><stop offset="100%" stopColor={C.blue}/></linearGradient>
@@ -248,27 +248,27 @@ function Hero(){
     <section style={{position:"relative",minHeight:"100vh",display:"flex",alignItems:"center",overflow:"hidden"}}>
       <div style={{position:"absolute",inset:0,background:C.navy,opacity:.4}}/>
       <div style={{position:"absolute",inset:0,opacity:.03,backgroundImage:`linear-gradient(${C.white} 1px,transparent 1px),linear-gradient(90deg,${C.white} 1px,transparent 1px)`,backgroundSize:"60px 60px"}}/>
-      <div style={{position:"relative",zIndex:2,maxWidth:1200,margin:"0 auto",padding:mob?"120px 20px 60px":"140px 24px 80px",display:"grid",gridTemplateColumns:mob?"1fr":"1fr 1fr",gap:mob?32:60,alignItems:"center",width:"100%"}}>
+      <div style={{position:"relative",zIndex:2,maxWidth:1400,margin:"0 auto",padding:mob?"100px 20px 40px":"100px 40px 40px",display:"grid",gridTemplateColumns:mob?"1fr":"1fr 1.1fr",gap:mob?24:40,alignItems:"center",width:"100%"}}>
         <div>
           <div style={{animation:"su .6s ease-out",animationFillMode:"backwards"}}>
-            <span style={{display:"inline-block",fontSize:mob?10:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal,border:`1px solid ${C.teal}33`,borderRadius:999,padding:"5px 14px",background:`${C.teal}0D`,marginBottom:20}}>Sales Execution Intelligence</span>
+            <span style={{display:"inline-block",fontSize:mob?10:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal,border:`1px solid ${C.teal}33`,borderRadius:999,padding:"5px 14px",background:`${C.teal}0D`,marginBottom:16}}>Sales Execution Intelligence</span>
           </div>
-          <div style={{display:"flex",gap:4,marginBottom:16,background:C.card,borderRadius:8,padding:3,border:`1px solid ${C.border}`,animation:"su .6s ease-out .08s",animationFillMode:"backwards",width:"fit-content"}}>
+          <div style={{display:"flex",gap:4,marginBottom:14,background:C.card,borderRadius:8,padding:3,border:`1px solid ${C.border}`,animation:"su .6s ease-out .08s",animationFillMode:"backwards",width:"fit-content"}}>
             {Object.entries(ROLES).map(([k,v])=>(<button key={k} onClick={()=>setRole(k)} style={{padding:mob?"5px 10px":"6px 14px",borderRadius:6,fontSize:mob?10:11,fontWeight:600,fontFamily:FB,border:"none",cursor:"pointer",transition:"all .3s",background:role===k?`linear-gradient(135deg,${C.teal},${C.blue})`:C.card,color:role===k?C.white:C.slate}}>{v.label}</button>))}
           </div>
-          <h1 style={{fontFamily:FH,fontWeight:900,fontSize:mob?36:tab?44:52,lineHeight:1.08,color:C.white,marginBottom:16,animation:"su .6s ease-out .15s",animationFillMode:"backwards"}}>
+          <h1 style={{fontFamily:FH,fontWeight:900,fontSize:mob?36:tab?48:58,lineHeight:1.05,color:C.white,marginBottom:16,animation:"su .6s ease-out .15s",animationFillMode:"backwards"}}>
             {r.h1}<br/><span className="gt">{r.h2}</span>
           </h1>
-          <p style={{fontSize:mob?15:17,color:C.slate,maxWidth:460,marginBottom:28,lineHeight:1.7,animation:"su .6s ease-out .3s",animationFillMode:"backwards"}}>{r.sub}</p>
+          <p style={{fontSize:mob?15:18,color:C.slate,maxWidth:500,marginBottom:28,lineHeight:1.7,animation:"su .6s ease-out .3s",animationFillMode:"backwards"}}>{r.sub}</p>
           <div style={{display:"flex",gap:12,flexWrap:"wrap",animation:"su .6s ease-out .45s",animationFillMode:"backwards"}}>
-            <a href="#contact" className="gb" style={{padding:mob?"12px 24px":"14px 32px",borderRadius:10,fontSize:mob?14:15,fontWeight:600,textDecoration:"none",fontFamily:FB}}>Request a Demo</a>
-            <a href="#demo" className="ob" style={{padding:mob?"12px 24px":"14px 32px",borderRadius:10,fontSize:mob?14:15,fontWeight:500,textDecoration:"none",fontFamily:FB}}>See It Live ↓</a>
+            <a href="#contact" className="gb" style={{padding:mob?"12px 24px":"16px 36px",borderRadius:10,fontSize:mob?14:16,fontWeight:600,textDecoration:"none",fontFamily:FB}}>Request a Demo</a>
+            <a href="#demo" className="ob" style={{padding:mob?"12px 24px":"16px 36px",borderRadius:10,fontSize:mob?14:16,fontWeight:500,textDecoration:"none",fontFamily:FB}}>See It Live ↓</a>
           </div>
         </div>
         <div style={{display:"flex",justifyContent:"center",alignItems:"center",animation:"su .8s ease-out .3s",animationFillMode:"backwards"}}>
-          <div style={{background:`${C.card}AA`,border:`1px solid ${C.border}`,borderRadius:16,padding:mob?"20px 16px 16px":"28px 20px 20px",backdropFilter:"blur(12px)",boxShadow:`0 24px 80px ${C.navy}88`}}>
-            <div style={{fontSize:9,fontFamily:FM,color:C.teal,marginBottom:12,letterSpacing:".1em",textTransform:"uppercase",display:"flex",alignItems:"center",gap:6}}>
-              <span style={{width:5,height:5,borderRadius:"50%",background:C.teal,display:"inline-block",animation:"pg 2s infinite"}}/>Live Org Mapping
+          <div style={{background:`${C.card}AA`,border:`1px solid ${C.border}`,borderRadius:20,padding:mob?"20px 16px 16px":"32px 28px 24px",backdropFilter:"blur(12px)",boxShadow:`0 24px 80px ${C.navy}88, 0 0 80px ${C.teal}08`,width:"100%",maxWidth:mob?360:580}}>
+            <div style={{fontSize:mob?9:11,fontFamily:FM,color:C.teal,marginBottom:mob?10:16,letterSpacing:".1em",textTransform:"uppercase",display:"flex",alignItems:"center",gap:6}}>
+              <span style={{width:6,height:6,borderRadius:"50%",background:C.teal,display:"inline-block",animation:"pg 2s infinite"}}/>Live Org Mapping
             </div>
             <OrgChart/>
           </div>
