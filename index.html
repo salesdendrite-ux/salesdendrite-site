@@ -31,7 +31,7 @@
     Hidden Netlify form (required for Netlify to detect the form at build time).
     The actual React form submits to this. Netlify's bot parses this static HTML.
   -->
-  <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+  <form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
     <input type="text" name="name" />
     <input type="email" name="email" />
     <input type="text" name="company" />
