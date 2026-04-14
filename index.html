@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SalesDendrite — Sales Execution Intelligence Platform</title>
+  <meta name="description" content="Map organizational hierarchies inside target accounts and turn intelligence into execution. The platform for sales execution intelligence." />
+  <meta name="author" content="SalesDendrite" />
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="SalesDendrite — Sales Execution Intelligence Platform" />
+  <meta property="og:description" content="Map organizational hierarchies inside target accounts and turn intelligence into execution." />
+  <meta property="og:url" content="https://salesdendrite.com" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SalesDendrite — Sales Execution Intelligence Platform" />
+  <meta name="twitter:description" content="Map the org. Own the deal." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+</head>
+<body>
+  <div id="root"></div>
+
+  <!--
+    Hidden Netlify form (required for Netlify to detect the form at build time).
+    The actual React form submits to this. Netlify's bot parses this static HTML.
+  -->
+  <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="text" name="company" />
+    <textarea name="message"></textarea>
+  </form>
+
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
