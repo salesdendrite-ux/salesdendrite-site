@@ -99,7 +99,6 @@ function useMedia(){
 /* ─── Hooks ─── */
 function useR(t=.08){const r=useRef(null),[v,s]=useState(false);useEffect(()=>{const el=r.current;if(!el)return;const o=new IntersectionObserver(([e])=>{if(e.isIntersecting){s(true);o.disconnect()}},{threshold:t});o.observe(el);return()=>o.disconnect()},[t]);return[r,v]}
 function Rev({children,delay=0,y=28,style={}}){const[r,v]=useR();return(<div ref={r} style={{opacity:v?1:0,transform:v?"none":`translateY(${y}px)`,transition:`opacity .7s cubic-bezier(.22,1,.36,1) ${delay}s, transform .7s cubic-bezier(.22,1,.36,1) ${delay}s`,...style}}>{children}</div>)}
-function ACt({end,sfx="",dur=2000}){const[v,sV]=useState(0);const[r,vis]=useR();useEffect(()=>{if(!vis)return;let s=0;const st=end/(dur/16);const t=setInterval(()=>{s+=st;if(s>=end){sV(end);clearInterval(t)}else sV(Math.floor(s))},16);return()=>clearInterval(t)},[vis,end,dur]);return(<span ref={r}>{v}{sfx}</span>)}
 function TW({text,speed=8,trigger=true}){const[d,sD]=useState("");const i=useRef(0);useEffect(()=>{if(!trigger){sD("");i.current=0;return}i.current=0;sD("");const t=setInterval(()=>{i.current++;sD(text.slice(0,i.current));if(i.current>=text.length)clearInterval(t)},speed);return()=>clearInterval(t)},[text,trigger,speed]);return(<span>{d}<span style={{borderRight:`2px solid ${C.teal}`,animation:"bk 1s infinite",marginLeft:1}}>&nbsp;</span></span>)}
 
 /* ─── Brand Logo ─── */
@@ -278,18 +277,11 @@ function Hero(){
   );
 }
 
-/* ═══════════ STATS ═══════════ */
-function Stats(){
-  const{mob}=useMedia();
-  const d=[{n:21,s:"",l:"Integrations"},{n:7,s:"",l:"Modules"},{n:4,s:"",l:"Data Layers"},{n:74,s:"+",l:"Endpoints"}];
-  return(<Rev style={{maxWidth:1000,margin:"0 auto",padding:"0 20px"}}><div style={{display:"grid",gridTemplateColumns:mob?"repeat(2,1fr)":"repeat(4,1fr)",gap:1,background:C.border,borderRadius:12,overflow:"hidden"}}>{d.map((s,i)=>(<div key={i} style={{background:C.navyMid,padding:mob?"20px 16px":"32px 24px",textAlign:"center"}}><div style={{fontFamily:FH,fontSize:mob?28:36,fontWeight:800,color:C.white}}><ACt end={s.n}/>{s.s}</div><div style={{fontSize:mob?11:13,color:C.slate,marginTop:4,fontWeight:500}}>{s.l}</div></div>))}</div></Rev>);
-}
-
 /* ═══════════ PROBLEM ═══════════ */
 function Problem(){
   const{mob}=useMedia();
   const ps=[
-    {icon:Ic.layers,title:"Contact databases are flat",desc:"ZoomInfo, Apollo, LinkedIn — names and titles. They don't tell you who reports to whom.",color:C.red},
+    {icon:Ic.layers,title:"Contact databases are flat",desc:"Traditional contact tools give you names and titles. They don't tell you who reports to whom.",color:C.red},
     {icon:Ic.bolt,title:"Intelligence stops at delivery",desc:"The gap between knowing and doing is where deals die.",color:C.amber},
     {icon:Ic.org,title:"Org structure is invisible",desc:"Buying committees are assembled from guesswork. Reps multi-thread into the wrong people.",color:C.purple},
     {icon:Ic.shield,title:"Enablement teams fly blind",desc:"Account plans built on stale CRM data and rep memory.",color:C.blue},
@@ -612,7 +604,7 @@ function Why(){
 /* ═══════════ CAROUSEL ═══════════ */
 function Carousel(){
   const[p,sP]=useState(false);
-  const items=["Salesforce","HubSpot","Veeva CRM","Dynamics 365","Google Drive","SharePoint","Confluence","Notion","Slack","Teams","SEC Edgar","ClinicalTrials.gov","LinkedIn","ZoomInfo","Apollo","Outreach"];
+  const items=["Salesforce","HubSpot","Veeva CRM","Dynamics 365","Google Drive","SharePoint","Confluence","Notion","Slack","Microsoft Teams","SEC Edgar","ClinicalTrials.gov"];
   return(
     <section style={{padding:"50px 0",overflow:"hidden"}}>
       <Rev><p style={{textAlign:"center",fontSize:11,fontWeight:600,letterSpacing:".15em",textTransform:"uppercase",color:C.slate,marginBottom:20}}>Connects with your stack</p></Rev>
@@ -628,8 +620,8 @@ function Compare(){
   const{mob}=useMedia();
   const[hov,setHov]=useState(null);
   const fs=[
-    {n:"Contact database",sd:1,zi:1,go:1,cl:1},{n:"Org hierarchy mapping",sd:1,zi:0,go:0,cl:0},{n:"AI email generation",sd:1,zi:0,go:1,cl:0},{n:"Buying committee mapping",sd:1,zi:0,go:0,cl:0},
-    {n:"Financial intelligence",sd:1,zi:0,go:0,cl:1},{n:"AI pre-call briefs",sd:1,zi:0,go:1,cl:0},{n:"Conversion strategies",sd:1,zi:0,go:0,cl:0},{n:"Capability matching",sd:1,zi:0,go:0,cl:0},{n:"Full context AI",sd:1,zi:0,go:0,cl:0},
+    {n:"Contact database",sd:1,ci:1,ri:1,rf:1},{n:"Org hierarchy mapping",sd:1,ci:0,ri:0,rf:0},{n:"AI email generation",sd:1,ci:0,ri:1,rf:0},{n:"Buying committee mapping",sd:1,ci:0,ri:0,rf:0},
+    {n:"Account financial intelligence",sd:1,ci:0,ri:0,rf:1},{n:"AI pre-call briefs",sd:1,ci:0,ri:1,rf:0},{n:"Stakeholder conversion strategies",sd:1,ci:0,ri:0,rf:0},{n:"Capability-to-need matching",sd:1,ci:0,ri:0,rf:0},{n:"Full context AI workspace",sd:1,ci:0,ri:0,rf:0},
   ];
   const Y=()=><span style={{color:C.teal,fontSize:14}}>✓</span>;
   const N=()=><span style={{color:C.border}}>—</span>;
@@ -638,10 +630,10 @@ function Compare(){
       <Rev><div style={{textAlign:"center",marginBottom:mob?32:48}}><span style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.teal}}>How We Compare</span><h2 style={{fontFamily:FH,fontWeight:800,fontSize:mob?24:36,color:C.white,marginTop:12}}>Built for sales execution intelligence.</h2></div></Rev>
       <Rev delay={.1}><div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,overflow:"auto",WebkitOverflowScrolling:"touch"}}>
         <table style={{width:"100%",borderCollapse:"collapse",fontSize:mob?11:13,minWidth:mob?500:"auto"}}>
-          <thead><tr style={{borderBottom:`1px solid ${C.border}`}}><th style={{padding:mob?"10px 12px":"14px 18px",textAlign:"left",color:C.slate,fontWeight:500}}>Feature</th><th style={{padding:"10px 8px",textAlign:"center",width:mob?70:95}}><span className="gt" style={{fontFamily:FH,fontWeight:700,fontSize:mob?11:13}}>SD</span></th><th style={{padding:"10px 8px",textAlign:"center",color:C.slate,fontWeight:500,width:mob?55:80}}>ZoomInfo</th><th style={{padding:"10px 8px",textAlign:"center",color:C.slate,fontWeight:500,width:mob?55:80}}>Gong</th><th style={{padding:"10px 8px",textAlign:"center",color:C.slate,fontWeight:500,width:mob?55:80}}>Clari</th></tr></thead>
+          <thead><tr style={{borderBottom:`1px solid ${C.border}`}}><th style={{padding:mob?"10px 12px":"14px 18px",textAlign:"left",color:C.slate,fontWeight:500}}>Feature</th><th style={{padding:"10px 8px",textAlign:"center",width:mob?70:95}}><span className="gt" style={{fontFamily:FH,fontWeight:700,fontSize:mob?11:13}}>SalesDendrite</span></th><th style={{padding:"10px 8px",textAlign:"center",color:C.slate,fontWeight:500,width:mob?60:90}}>Contact Intel Tools</th><th style={{padding:"10px 8px",textAlign:"center",color:C.slate,fontWeight:500,width:mob?60:90}}>Revenue Intel Tools</th><th style={{padding:"10px 8px",textAlign:"center",color:C.slate,fontWeight:500,width:mob?60:90}}>Revenue Forecasting</th></tr></thead>
           <tbody>{fs.map((f,i)=>(<tr key={i} onMouseEnter={()=>setHov(i)} onMouseLeave={()=>setHov(null)} style={{borderBottom:i<fs.length-1?`1px solid ${C.border}44`:"none",background:hov===i?C.cardHover:i%2===0?"transparent":C.navyMid+"44",transition:"background .2s"}}>
             <td style={{padding:mob?"8px 12px":"11px 18px",color:hov===i?C.white:C.slateLight,fontWeight:500}}>{f.n}</td>
-            <td style={{textAlign:"center",background:C.teal+"08"}}>{f.sd?<Y/>:<N/>}</td><td style={{textAlign:"center"}}>{f.zi?<Y/>:<N/>}</td><td style={{textAlign:"center"}}>{f.go?<Y/>:<N/>}</td><td style={{textAlign:"center"}}>{f.cl?<Y/>:<N/>}</td>
+            <td style={{textAlign:"center",background:C.teal+"08"}}>{f.sd?<Y/>:<N/>}</td><td style={{textAlign:"center"}}>{f.ci?<Y/>:<N/>}</td><td style={{textAlign:"center"}}>{f.ri?<Y/>:<N/>}</td><td style={{textAlign:"center"}}>{f.rf?<Y/>:<N/>}</td>
           </tr>))}</tbody>
         </table>
       </div></Rev>
@@ -705,6 +697,6 @@ function Foot(){
 /* ═══════════ APP ═══════════ */
 export default function App(){return(
   <div style={{minHeight:"100vh"}}>
-    <Sty/><FlowingBG/><CursorGlow/><Particles/><Nav/><Hero/><Stats/><Problem/><Platform/><Demo/><Modules/><Why/><Carousel/><Compare/><Contact/><Foot/>
+    <Sty/><FlowingBG/><CursorGlow/><Particles/><Nav/><Hero/><Problem/><Platform/><Demo/><Modules/><Why/><Carousel/><Compare/><Contact/><Foot/>
   </div>
 )}
