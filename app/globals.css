@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { background: #0B1D3A; color: #CBD5E1; font-family: 'DM Sans', sans-serif; line-height: 1.6; overflow-x: hidden; }
+::selection { background: #00C9A733; color: #FFFFFF; }
+
+@keyframes su { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bk { 0%, 50% { border-color: #00C9A7; } 51%, 100% { border-color: transparent; } }
+@keyframes pg { 0%, 100% { opacity: .4; } 50% { opacity: .9; } }
+@keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes fd { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+@keyframes float1 { 0%, 100% { transform: translateY(0) translateX(0); } 25% { transform: translateY(-20px) translateX(10px); } 50% { transform: translateY(-10px) translateX(-8px); } 75% { transform: translateY(-25px) translateX(5px); } }
+@keyframes float2 { 0%, 100% { transform: translateY(0) translateX(0); } 33% { transform: translateY(-15px) translateX(-12px); } 66% { transform: translateY(-8px) translateX(15px); } }
+@keyframes float3 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+
+.gt { background: linear-gradient(135deg, #00C9A7, #2D7FF9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.gta { background: linear-gradient(135deg, #F59E0B, #EF4343); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.gb { background: linear-gradient(135deg, #00C9A7, #2D7FF9); color: #FFFFFF; border: none; cursor: pointer; transition: all .3s; text-decoration: none; display: inline-block; }
+.gb:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #00C9A744; }
+.ob { background: transparent; color: #FFFFFF; border: 1px solid #1E3A5F; cursor: pointer; transition: all .3s; text-decoration: none; display: inline-block; }
+.ob:hover { border-color: #00C9A7; background: #00C9A711; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0B1D3A; }
+::-webkit-scrollbar-thumb { background: #1E3A5F; border-radius: 3px; }
