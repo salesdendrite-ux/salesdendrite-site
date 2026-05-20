@@ -53,9 +53,18 @@ export default function ModulePage() {
             </Link>
 
             <div style={{display:"flex",flexDirection:mob?"column":"row",alignItems:mob?"flex-start":"flex-start",gap:mob?24:40}}>
-              {/* Emoji icon */}
-              <div style={{flexShrink:0,width:mob?72:96,height:mob?72:96,borderRadius:20,background:`${m.color}12`,border:`2px solid ${m.color}40`,boxShadow:`0 0 30px ${m.color}25`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:mob?36:48,animation:"su .6s ease-out",animationFillMode:"backwards"}}>
-                {m.emoji}
+              {/* Module icon */}
+              <div style={{flexShrink:0,width:mob?72:96,height:mob?72:96,borderRadius:20,background:`${m.color}12`,border:`2px solid ${m.color}40`,boxShadow:`0 0 30px ${m.color}25`,display:"flex",alignItems:"center",justifyContent:"center",animation:"su .6s ease-out",animationFillMode:"backwards"}}>
+                <svg width={mob?36:48} height={mob?36:48} viewBox="0 0 24 24" fill="none" stroke={m.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  {m.slug==="stakeholder-directory"&&<><circle cx="8" cy="6" r="3"/><circle cx="16" cy="6" r="3"/><path d="M2 20c0-4 3-7 6-7"/><path d="M16 13c3 0 6 3 6 7"/></>}
+                  {m.slug==="public-intelligence"&&<><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 16V11M11 16V8M15 16V13"/></>}
+                  {m.slug==="intel-hub"&&<><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></>}
+                  {m.slug==="ai-workspace"&&<><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="10" r="1.5" fill={m.color}/><circle cx="15" cy="10" r="1.5" fill={m.color}/><path d="M9 15c1.5 1.5 4.5 1.5 6 0"/></>}
+                  {m.slug==="buying-committee"&&<><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill={m.color}/></>}
+                  {m.slug==="target-stakeholders"&&<><circle cx="8" cy="6" r="3"/><path d="M2 20c0-4 3-7 6-7M12 13v4M10 17h4"/><circle cx="16" cy="6" r="3"/><path d="M16 13c3 0 6 3 6 7"/></>}
+                  {m.slug==="capability-intelligence"&&<><polygon points="12,2 22,8.5 12,15 2,8.5"/><polyline points="2,15.5 12,22 22,15.5" opacity=".5"/><polyline points="2,12 12,18.5 22,12" opacity=".7"/></>}
+                  {m.slug==="settings"&&<><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></>}
+                </svg>
               </div>
 
               <div style={{flex:1}}>
